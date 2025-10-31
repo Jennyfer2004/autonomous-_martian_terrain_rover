@@ -40,7 +40,7 @@ class CSPRover:
         pis = [v for k, v in asignacion.items() if "PI_" in k and v is not None]
         print(pis)
         for destino in pis:
-            costo, tiempo = self.contexto.buscar_ruta((0, 0), destino)
+            costo, tiempo = self.contexto.buscar((0, 0), destino)
             if costo >= 45 or tiempo >= 90:
                 return False
         return True
