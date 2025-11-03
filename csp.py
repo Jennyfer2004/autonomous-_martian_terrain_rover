@@ -5,6 +5,7 @@ class CSPRover:
         self.contexto = contexto
         # self.variables = ["puntos de interes","puntos de recoleccion"]
         self.dominios={}
+        self.variables = []
         # self.restricciones = []
         self.PI=PI
     
@@ -33,14 +34,18 @@ class CSPRover:
         
     def restricciones(self,asignacion):
         """Agrega funciones que validan las restricciones del CSP"""
-        
+
         posiciones = list(asignacion.values())
-        if len(posiciones) > len(set(posiciones))-1:
-            return False
+        # print(posiciones)
+
+        # if len(posiciones) > len(set(posiciones))-1:
+        #     return False
         pis = [v for k, v in asignacion.items() if "PI_" in k and v is not None]
-        print(pis)
+        # print(pis)
         for destino in pis:
             costo, tiempo, _ = self.contexto.buscar((0, 0), destino)
+            # print(destino,costo, tiempo)
+
             if costo >= 45 or tiempo >= 90:
                 return False
         return True
@@ -64,8 +69,7 @@ class CSPRover:
     def ejecutar(self):
         """Ejecuta todo el proceso CSP"""
         self.definir_dominios()
-        self.definir_restricciones()
         solucion = self.resolver()
-
+        print(solucion)
         if solucion:
             return solucion 
