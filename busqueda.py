@@ -6,9 +6,9 @@ def heuristica(a, b, tipo="euclidiana"):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
     return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
-def buscar_ruta(contexto, inicio, objetivo, tipo="dijkstra", tipo_heuristica="manhattan"):
+def buscar_ruta(contexto, inicio, objetivo, tipo="a_star", tipo_heuristica="manhattan"):
     open_set = []
-    # Formato: (prioridad f, costo acumulado g, tiempo, nodo)
+
     heapq.heappush(open_set, (0, 0, 0, inicio))
     came_from = {}
     g_score = {inicio: [0, 0]} 
