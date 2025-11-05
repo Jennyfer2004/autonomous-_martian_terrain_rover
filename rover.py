@@ -11,8 +11,7 @@ class Rover:
         self.muestras_recolectadas = set() 
         self.imagenes = 0
         self.comunicacion = True  # Solo True cuando está en base
-        self.dejar_muestras= True # Solo cuando est en el punto estrategico de poner las muestras 
-        # self.brazo_activo = False
+        self.dejar_muestras= True # Solo cuando esta en el punto estrategico de poner las muestras 
 
     def mover(self, dx, dy, coste, tiempo):
         if self.energia >= coste :
@@ -22,7 +21,6 @@ class Rover:
             self.tiempo_restante-tiempo
             return True
         else:
-            print()
             print("Energía insuficiente para moverse.")
 
     def recargar(self):
@@ -33,13 +31,6 @@ class Rover:
         self.energia = self.energia_max
         print("Rover recargado en la base.")
 
-    # def recolectar(self):
-    #     if self.energia >= 2:
-    #         self.muestras += 1
-    #         self.energia -= 2
-    #         print("Mineral recolectado.")
-    #     else:
-    #         print("Activa el brazo robótico o recarga energía.")
     def recolectar(self, coordenadas_poi):
         if self.energia >= 2:
             self.muestras_recolectadas.add(coordenadas_poi)
@@ -58,6 +49,3 @@ class Rover:
         else:
             print(" No tiene sufificente energía o tiempo para realizar esta acción")
         
-    # def activar_brazo(self):
-    #     self.brazo_activo = True
-    #     print("Brazo robótico activado.")
