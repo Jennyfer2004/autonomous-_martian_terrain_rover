@@ -1,12 +1,13 @@
 
+
 import random
 
 from rover import *
 from csp import *
 from busqueda import *
 from planificacion_metaheuristica import *
-
-
+from bfs import *
+from constantes import *
 
 class ContextoMarciano:
     def __init__(self, tamaño=15, energia_max=100,tiempo_max = 180,rover=[0,0],base=(0,0)):
@@ -16,8 +17,8 @@ class ContextoMarciano:
         self.base = base
         self.muestras_analizadas = set()
 
-        self.asignar_puntos_interes()
-
+        self.existen_puntos_interes=self.asignar_puntos_interes()
+        
     def generar_mapa(self):
         terrenos = ['.',"*", 'A', 'D', 'O']
         pesos = [0.5,0.3 ,0.25, 0.15, 0.1]
@@ -34,8 +35,10 @@ class ContextoMarciano:
             # self.punto_recolectar = solucion[-1]
             self.puntos_interes = [solucion[var] for var in solucion if "PI_" in var]
             self.punto_recolectar = solucion["REC"]
+            return True
         else:
             print("⚠️ No se pudo generar una solución CSP válida.")
+            return False
             
     def mostrar_mapa(self):
         for i in range(self.tamaño):
@@ -79,11 +82,11 @@ class ContextoMarciano:
             return self.mapa[x][y] != 'O'
         return False
 
-    def buscar(self,posicion=None,base=None):
+    def buscar(self,posicion=None,base=None,tipo="a_star",tipo_heuristica="manhattan"):
         if posicion and base:
-            ruta= buscar_ruta(self, posicion, base)
+            ruta= buscar_ruta(self, posicion, base,tipo,tipo_heuristica)
         else: 
-            ruta=buscar_ruta(self, (self.rover.x, self.rover.y), self.base)
+            ruta=buscar_ruta(self, (self.rover.x, self.rover.y), self.base,tipo,tipo_heuristica)
         if ruta:
             coste=0
             tiempo=0
@@ -91,9 +94,10 @@ class ContextoMarciano:
                 terreno = self.tipo_terreno(paso[0], paso[1])
                 coste += self.coste_movimiento(terreno)
                 tiempo +=self.tiempo_movimiento(terreno)
-
-        return (coste,tiempo,ruta)
-
+            return (coste,tiempo,ruta)
+        else:
+            print("No existe una ruta entre esas dos ubicaiones")
+            return None,None,None
     def _volver_a_base(self):
         """Vuelve a la base desde la posición actual"""
         coste,tiempo,ruta = self.buscar((self.rover.x, self.rover.y), self.base)
@@ -124,6 +128,7 @@ class ContextoMarciano:
             2. Se han dejado todas las muestras (implícito en el paso 1).
             3. El rover está de VUELTA en la base.
             """
+            # print(len(estado['muestras_analizadas']),len(self.puntos_interes),estado['posicion'])
             todos_pois_analizados = len(estado['muestras_analizadas']) == len(self.puntos_interes)
             en_base_final = estado['posicion'] == self.base
             
@@ -131,7 +136,43 @@ class ContextoMarciano:
                     
         return estado_inicial, es_objetivo
 
+# DENTRO de la clase ContextoMarciano
 
+    def simular_con_bfs(self):
+        """
+        Inicia la simulación usando Búsqueda en Anchura (BFS) para planificar la misión.
+        BFS garantiza encontrar el plan de menor coste.
+        """
+        print(f"\n🧠 Iniciando simulación con BÚSQUEDA EN ANCHURA (BFS)...\n")
+        
+        # Verificar que tenemos POIs definidos por el CSP
+        if not hasattr(self, 'puntos_interes') or not self.puntos_interes:
+            print("❌ No hay puntos de interés definidos. No se puede planificar la misión.")
+            return None
+
+        # 1. Definir el estado y el objetivo para el planificador
+        estado_inicial, es_objetivo = self._definir_estado_objetivo()
+        
+        # 2. Crear y configurar el planificador BFS
+        planificador_bfs = PlanificadorBFS(
+            contexto=self,
+            estado_inicial=estado_inicial,
+            objetivos=es_objetivo,
+            acciones=ACCIONES_PLANIFICADOR
+        )
+        
+        # 3. Ejecutar la búsqueda para encontrar el plan óptimo
+        mejor_plan = planificador_bfs.resolver()
+
+        # 4. Ejecutar el plan encontrado en el mundo real
+        if mejor_plan:
+            print(f"\n📍 Plan óptimo encontrado con {len(mejor_plan)} pasos.")
+            # Reutilizamos el mismo método de ejecución que ya tenías
+            return [self._ejecutar_plan(mejor_plan), mejor_plan]
+        else:
+            print("\n❌ No se pudo encontrar un plan viable para la misión.")
+            print("   Puede deberse a que los POIs son inalcanzables con la energía disponible.")
+            return None
     def simular_con_metaheuristica(self, algoritmo="GA"):
         """
         Inicia la simulación usando una metaheurística seleccionada para planificar la misión.
@@ -142,7 +183,7 @@ class ContextoMarciano:
         # Verificar que tenemos POIs definidos por el CSP
         if not hasattr(self, 'puntos_interes') or not self.puntos_interes:
             print("❌ No hay puntos de interés definidos. No se puede planificar la misión.")
-            return
+            return None
 
         # 1. Definir el estado y el objetivo para el planificador
         estado_inicial, es_objetivo = self._definir_estado_objetivo()
@@ -173,7 +214,7 @@ class ContextoMarciano:
             )
         else:
             print("❌ Algoritmo de metaheurística no reconocido. Usa 'GA' o 'SA'.")
-            return
+            return None
         
         # 3. Optimizar para encontrar el mejor plan
         print("🔍 Buscando el mejor plan...")
@@ -183,11 +224,11 @@ class ContextoMarciano:
         if mejor_plan:
             print(f"\n📍 Plan optimizado encontrado con {len(mejor_plan)} pasos.")
             # Llama al método que ejecuta el plan paso a paso
-            self._ejecutar_plan(mejor_plan)
+            return [self._ejecutar_plan(mejor_plan),mejor_plan]
         else:
             print("\n❌ No se pudo encontrar un plan viable para la misión.")
             print("   Puede deberse a que los POIs son inalcanzables con la energía disponible.")
-
+            return None
     def _ejecutar_plan(self, plan):
         """Ejecuta un plan paso a paso con verificación de seguridad energética y acumula coste y tiempo."""
         print("🚀 Ejecutando plan optimizado con sistema de seguridad...")
@@ -209,7 +250,7 @@ class ContextoMarciano:
                 coste, tiempo, _ = self._ejecutar_ir_a_base(parametro)
             elif accion_nombre == 'recargar':
                 coste, tiempo = self._ejecutar_recargar()
-            elif accion_nombre == 'dejar_muestras':
+            elif accion_nombre == 'dejar_muestras' :
                 coste, tiempo = self._ejecutar_dejar_muestras()
             else:
                 coste = 0
@@ -226,9 +267,12 @@ class ContextoMarciano:
 
         if self.mision_completada():
             print("✅ ¡MISIÓN CUMPLIDA CON ÉXITO!")
+            return coste_total,tiempo_total
+
         else:
             print("❌ La misión NO se completó completamente.")
             print(f"Estado final: Muestras analizadas {len(self.muestras_analizadas)}/{len(self.puntos_interes)}, Rover en base: {(self.rover.x, self.rover.y) == self.base}")
+            return None
 
 
     def _ejecutar_ir_a_base(self, base):
@@ -310,7 +354,7 @@ class ContextoMarciano:
                 coste = self.coste_movimiento(terreno)
                 tiempo = self.tiempo_movimiento(terreno)
                 if not self.rover.mover(dx, dy, coste, tiempo):
-                    print(coste1,tiempo1,coste,tiempo, self.rover.energia,self.rover.tiempo_restante)
+                    # print(coste1,tiempo1,coste,tiempo, self.rover.energia,self.rover.tiempo_restante)
                     print("❌ Movimiento fallido",self.rover.x, self.rover.y)
                     break
                 
@@ -318,6 +362,7 @@ class ContextoMarciano:
             if len(self.rover.muestras_recolectadas) > 0:
                 # <-- CAMBIO CLAVE: Transferir muestras del rover al contexto
                 print("📦 Depositando muestras en el punto de recolección...")
+                
                 self.muestras_analizadas.update(self.rover.muestras_recolectadas)
                 self.rover.muestras_recolectadas.clear()
                 print(f"✅ Muestras depositadas. Total analizadas: {len(self.muestras_analizadas)}")
@@ -328,6 +373,7 @@ class ContextoMarciano:
                 return coste1, tiempo1
         else:
             print("❌ No se puede depositar: no está en el punto de recolección.")
+            return coste1, tiempo1
 
 
     def _ejecutar_recargar(self):
@@ -545,6 +591,19 @@ class ContextoMarciano:
 # # Simular con planificación clásica
 
 # # Simular con metaheurística GA
+# contexto.simular_con_metaheuristica("GA")
+
+# # Simular con metaheurística SA  
+# contexto.simular_con_metaheuristica("SA")
+# print(1)
+# for i in range(2):
+#     print(2)
+#     contexto = ContextoMarciano(tamaño=15, energia_max=100)
+
+
+# # Simular con el nuevo planificador BFS
+#     print(111111,contexto.simular_con_metaheuristica("GA")[0][0])
+
 # contexto.simular_con_metaheuristica("GA")
 
 # # Simular con metaheurística SA  
