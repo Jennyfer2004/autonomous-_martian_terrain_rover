@@ -3,10 +3,10 @@ import random
 class CSPRover:
     def __init__(self, contexto,PI=3):
         self.contexto = contexto
-        # self.variables = ["puntos de interes","puntos de recoleccion"]
+
         self.dominios={}
         self.variables = []
-        # self.restricciones = []
+
         self.PI=PI
     
     def definir_dominios(self):
@@ -36,17 +36,18 @@ class CSPRover:
         """Agrega funciones que validan las restricciones del CSP"""
 
         posiciones = list(asignacion.values())
-        # print(posiciones)
 
-        # if len(posiciones) > len(set(posiciones))-1:
-        #     return False
+        if len(set(posiciones)) < len(self.variables):
+
+            return False
         pis = [v for k, v in asignacion.items() if "PI_" in k and v is not None]
-        # print(pis)
+
         for destino in pis:
             costo, tiempo, _ = self.contexto.buscar((0, 0), destino)
-            # print(destino,costo, tiempo)
 
-            if costo >= 45 or tiempo >= 90:
+            if not costo :
+                return False
+            if costo >= 45:
                 return False
         return True
 
@@ -62,6 +63,7 @@ class CSPRover:
             }
 
             if self.restricciones(asignacion):
+
                 return asignacion 
         print(" No tiene solución posible este entorno")
         return None    
@@ -70,6 +72,6 @@ class CSPRover:
         """Ejecuta todo el proceso CSP"""
         self.definir_dominios()
         solucion = self.resolver()
-        print(solucion)
+
         if solucion:
             return solucion 
