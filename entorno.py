@@ -20,6 +20,7 @@ class ContextoMarciano:
         self.existen_puntos_interes=self.asignar_puntos_interes()
         
     def generar_mapa(self):
+        """Genera el mapa aleatoriamente con los obstáculos"""
         terrenos = ['.',"*", 'A', 'D', 'O']
         pesos = [0.5,0.3 ,0.25, 0.15, 0.1]
         return [[random.choices(terrenos, pesos)[0] for _ in range(15)] for _ in range(15)]
@@ -39,6 +40,7 @@ class ContextoMarciano:
             return False
             
     def mostrar_mapa(self):
+        """ Mostrar el mapa"""
         for i in range(self.tamaño):
             fila = ""
             for j in range(self.tamaño):
@@ -55,11 +57,13 @@ class ContextoMarciano:
         print(f"Energía: {self.rover.energia} | Tiempo: {self.rover.tiempo_restante} | Muestras: {self.rover.muestras} ")
         
     def tipo_terreno(self, x, y):
+        """Dice que tipo de terreno es"""
         if 0 <= x < self.tamaño and 0 <= y < self.tamaño:
             return self.mapa[x][y]
         return 'O'
 
     def coste_movimiento(self, terreno):
+        """Coste de moverse """
         if terreno == '.': return 1
         if terreno == 'A': return 2
         if terreno == 'D': return 3
@@ -68,6 +72,7 @@ class ContextoMarciano:
         return 999  # obstáculo o inválido
     
     def tiempo_movimiento(self, terreno):
+        """tiempo de moverse"""
         if terreno == '.': return 2
         if terreno == 'A': return 6
         if terreno == 'D': return 8
@@ -76,11 +81,13 @@ class ContextoMarciano:
         return 999  # obstáculo o inválido
     
     def celda_valida(self, x, y):
+        """Celdas válidas"""
         if 0 <= x < self.tamaño and 0 <= y < self.tamaño:
             return self.mapa[x][y] != 'O'
         return False
 
     def buscar(self,posicion=None,base=None,tipo="a_star",tipo_heuristica="manhattan"):
+        """Llama a la función buscar_ruta y devuelve coste , tiempo y la ruta encontrada """
         if posicion and base:
             ruta= buscar_ruta(self, posicion, base,tipo,tipo_heuristica)
         else: 
@@ -139,7 +146,7 @@ class ContextoMarciano:
         Inicia la simulación usando Búsqueda en Anchura (BFS) para planificar la misión.
         BFS garantiza encontrar el plan de menor coste.
         """
-        print(f"\n🧠 Iniciando simulación con BÚSQUEDA EN ANCHURA (BFS)...\n")
+        print(f"\n Iniciando simulación con BÚSQUEDA EN ANCHURA (BFS)...\n")
         
         if not hasattr(self, 'puntos_interes') or not self.puntos_interes:
             print(" No hay puntos de interés definidos. No se puede planificar la misión.")
