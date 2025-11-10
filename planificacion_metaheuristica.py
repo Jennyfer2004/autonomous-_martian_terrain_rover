@@ -53,9 +53,7 @@ class PlanificadorMetaheuristicoAG:
         
     def reparar_plan(self, plan):
         """
-        Ajusta el plan para:
-        1. Evitar visitar el mismo POI dos veces.
-        2. Forzar ir a base y recargar si la energía no alcanza para la siguiente acción.
+        Ajusta el plan para eliminar errores
         """
         pois_vistos = set()
         nuevo_plan = []
@@ -195,6 +193,7 @@ class PlanificadorMetaheuristicoAG:
         return coste_final, tiempo_total, estado
 
     def fitness(self, plan):
+        """Calcula el fitness"""
         coste, tiempo, _ = self.simular_plan(plan) 
         if coste == 10000: 
             return 0.0
@@ -204,6 +203,7 @@ class PlanificadorMetaheuristicoAG:
         return 1 / (1 + valor_combinado)
 
     def cruzar(self, plan1, plan2):
+        """Ejecuta el cruce"""
         if not plan1 or not plan2 or len(plan1)<5 or len(plan2)<5 : 
             return copy.deepcopy(plan1), copy.deepcopy(plan2)
         p = random.randint(1, min(len(plan1), len(plan2)) - 1)
@@ -285,11 +285,7 @@ class PlanificadorMetaheuristicoSA:
 
     def reparar_plan(self, plan):
         """
-        Ajusta el plan para:
-        1. Evitar visitar el mismo POI dos veces.
-        2. Forzar ir a base y recargar si la energía no alcanza para la siguiente acción.
-        3. Evitar secuencias consecutivas de 'ir_a_base' + 'recargar' repetidas.
-        """
+        Ajusta el plan para arreglar errores"""
         pois_vistos = set()
         nuevo_plan = []
         energia = self.estado_inicial['energia']
@@ -488,7 +484,7 @@ class PlanificadorMetaheuristicoSA:
             temperatura *= self.enfriamiento
             iteracion += 1
 
-        print("\n✅ Optimización con Recocido Simulado finalizada.")
+        print("\n Optimización con Recocido Simulado finalizada.")
         print("Mejor plan encontrado:")
         for paso in self.mejor_solucion:
             print("  -", paso)
