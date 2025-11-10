@@ -24,7 +24,7 @@ for _ in range(repeticiones):
         print(t)
         if t == "dijkstra":
             coste, tiempo, ruta = contexto.buscar(inicio, objetivo, tipo=t)
-            # print(coste, tiempo,"dijkstra")
+
             resultados.append({
                 "algoritmo": t,
                 "heuristica": None,
@@ -35,7 +35,7 @@ for _ in range(repeticiones):
         else:
             for h in heuristicas:
                 coste, tiempo, ruta = contexto.buscar(inicio, objetivo, tipo=t, tipo_heuristica=h)
-                # print("a_star",coste, tiempo,h)
+
                 resultados.append({
                     "algoritmo": t,
                     "heuristica": h,
@@ -45,13 +45,11 @@ for _ in range(repeticiones):
                 })
 
 
-# Agrupar por algoritmo y heurística
 agrupados = defaultdict(list)
 for r in resultados:
     clave = (r["algoritmo"], r["heuristica"])
     agrupados[clave].append(r)
 
-# Preparar listas para gráficas
 alg_heu = []
 prom_pasos = []
 prom_costo = []
@@ -68,7 +66,6 @@ for clave, vals in agrupados.items():
     prom_costo.append(statistics.mean(costo) if costo else 0)
     prom_tiempo_real.append(statistics.mean(tiempo_real) if tiempo_real else 0)
 
-# === GRÁFICOS DE BARRAS ===
 
 # Pasos promedio
 plt.figure(figsize=(10, 5))
@@ -97,7 +94,6 @@ plt.title("Comparación de tiempo real promedio por algoritmo y heurística")
 plt.tight_layout()
 plt.show()
 
-# === BOXPLOT DE DISTRIBUCIÓN ===
 
 pasos_todos = []
 costo_todos = []
