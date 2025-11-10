@@ -3,6 +3,9 @@ from entorno import *
 import time
 import pandas as pd
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 NUM_EJECUCIONES = 30
 TAMAÑO_MAPA = 4
 ENERGIA_MAX = 100
@@ -61,9 +64,6 @@ df = pd.DataFrame(todos_los_resultados)
 df.to_csv(RESULTADOS_FILE, index=False)
 print(f"\n✅ Todos los resultados guardados en '{RESULTADOS_FILE}'")
 print(df.head()) 
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 df = pd.read_csv('resultados_comparacion.csv')
 
@@ -77,7 +77,7 @@ print(stats_tiempo_busqueda)
 
 sns.set_theme(style="whitegrid")
 
-# Gráfico 1: Boxplot para comparar la distribución del Coste del Plan
+# Boxplot para comparar la distribución del Coste del Plan
 plt.figure(figsize=(10, 6))
 sns.boxplot(x='Algoritmo', y='Coste_Plan', data=df)
 plt.title('Comparación del Coste del Plan entre Algoritmos')
@@ -85,7 +85,7 @@ plt.ylabel('Coste del Plan')
 plt.xlabel('Algoritmo')
 plt.show()
 
-# Gráfico 2: Boxplot para comparar el Tiempo de Búsqueda
+# Boxplot para comparar el Tiempo de Búsqueda
 plt.figure(figsize=(10, 6))
 sns.boxplot(x='Algoritmo', y='Tiempo_Busqueda', data=df)
 plt.title('Comparación del Tiempo de Búsqueda entre Algoritmos')
@@ -93,7 +93,7 @@ plt.ylabel('Tiempo de Búsqueda (segundos)')
 plt.xlabel('Algoritmo')
 plt.show()
 
-# Gráfico 3: Barplot para comparar la media del Tiempo de Ejecución
+# Barplot para comparar la media del Tiempo de Ejecución
 plt.figure(figsize=(10, 6))
 sns.barplot(x='Algoritmo', y='Tiempo_Ejecucion', data=df, estimator='mean', errorbar='sd') 
 plt.title('Tiempo de Ejecución Promedio del Plan')
