@@ -221,7 +221,7 @@ class ContextoMarciano:
             return None
     def _ejecutar_plan(self, plan):
         """Ejecuta un plan paso a paso con verificación de seguridad energética y acumula coste y tiempo."""
-        print(" Ejecutando plan optimizado con sistema de seguridad...")
+        # print(" Ejecutando plan optimizado con sistema de seguridad...")
 
         coste_total = 0
         tiempo_total = 0
