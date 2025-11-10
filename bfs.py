@@ -14,18 +14,20 @@ class PlanificadorBFS:
 
     def es_objetivo(self,estado,plan_actual):
             """
-            La misión se cumple SOLO si:
-            1. Se han visitado y analizado TODOS los POIs.
-            2. Se han dejado todas las muestras (implícito en el paso 1).
-            3. El rover está de VUELTA en la base.
+            La misión se cumple si:
+            1. Se han visitado todos los POIs.
+            2. Se han dejado todas las muestras.
+            3. El rover está en la base.
             """
 
             todos_pois_analizados = len(estado['muestras_analizadas']) == len(self.contexto.puntos_interes)
             en_base_final = estado['posicion'] == self.contexto.base
             
             return todos_pois_analizados and en_base_final
+        
     def resolver(self):
         """Búsqueda en anchura para encontrar el plan óptimo."""
+        
         print("🧠 Iniciando búsqueda BFS...")
         start_time = time.time()
         
@@ -45,10 +47,10 @@ class PlanificadorBFS:
             
             if self.es_objetivo(estado_actual,plan_actual):
                 end_time = time.time()
-                print(f"\n✅ ¡Plan óptimo encontrado!")
-                print(f"📊 Nodos explorados: {self.nodos_explorados}")
-                print(f"⏱️ Tiempo de búsqueda: {end_time - start_time:.4f} segundos")
-                print(f"💰 Coste total del plan: {coste_actual}")
+                print(f"\n ¡Plan óptimo encontrado!")
+                print(f" Nodos explorados: {self.nodos_explorados}")
+                print(f"⏱ Tiempo de búsqueda: {end_time - start_time:.4f} segundos")
+                print(f" Coste total del plan: {coste_actual}")
                 self.mejor_plan = plan_actual
                 self.mejor_coste = coste_actual
 
