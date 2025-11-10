@@ -51,11 +51,11 @@ Este comando iniciará la simulación con metaheurísticas, donde el rover explo
 
 ### Estrategias de Planificación
 
-| Algoritmo | Count | Mean (Costo) | Std (Costo) | Mean (Tiempo ms) |
-|-----------|-------|--------------|-------------|------------------|
-| BFS       | 28.0  | 50.57        | 11.01       | 2.55             |
-| SA        | 16.0  | 51.87        | 17.09       | 3.83             |
-| GA        | 16.0  | 59.25        | 15.53       | 7.93             |
+| Algoritmo | Mean (Costo) | Std (Costo) | Mean (Tiempo ms) |
+|-----------|--------------|-------------|------------------|
+| BFS       | 50.57        | 11.01       | 2.55             |
+| SA        | 51.87        | 17.09       | 3.83             |
+| GA        | 59.25        | 15.53       | 7.93             |
 
 ## Conclusiones
 
